@@ -24,4 +24,4 @@ ETUDE_IMPORTANT:
       Surface:
          rectangle:
            length : 5000 # en mètres
-           heigth : 4000
+           height : 4000
