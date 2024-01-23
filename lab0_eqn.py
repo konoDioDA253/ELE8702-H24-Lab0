@@ -5,7 +5,8 @@
 # Question 1: est-ce que le fichier de sortie lab0_eqn_coords.txt doit séparer la dernière ligne d'antenne et la première ligne de UE avec une ligne vide?
 # Question 2: Quel est l'espace entre les colonnes du fichier lab0_eqn_coords.txt
 # Question 3: les IDs d'appareil dans lab0_eqn_coords.txt doivent avoir le moins de chiffre possible? 
-
+# Question 4: faut t-il que l'alignement soit respecté entre les colonnes?
+# Question 5: faut-il nommer le fichier de sortie lab0_eqn_sortie.txt ou lab0_eqn_coords.txt?
 import sys
 import math
 import yaml
@@ -14,6 +15,7 @@ import random
 # Variables GLOBAL
 numero_equipe = 'n'
 numero_lab = '0'
+
 
 # Germe de toutes les fonctions aléatoires
 random.seed(123)
@@ -29,6 +31,7 @@ class Antenna:
         # (PROF) Est-ce que c'est correct de modifier comme cela la classe?
         self.coordx = None
         self.coordy = None
+        self.group = None
 
     
 class UE:
@@ -42,6 +45,8 @@ class UE:
         # (PROF) Est-ce que c'est correct de modifier comme cela la classe?
         self.coordx = None
         self.coordy = None
+        self.apptype = None
+
 
 def fill_up_the_lattice(N, lh, lv, nh, nv):
     """Function appelée par get_rectangle_lattice_coords()"""
@@ -167,12 +172,14 @@ def assigner_coordonnees_ues(fichier_de_cas):
     nombre_ues_ue2 = fichier_de_cas['ETUDE_IMPORTANT']['DEVICES']['UE2-App2']['number']
     type_de_generation = fichier_de_cas['ETUDE_IMPORTANT']['UE_COORD_GEN']
 
+    # (PROF) Est-ce que la division en deux boucles for est considéré Hard-wired? (si oui juste utiliser string concatenation)
     for i in range(nombre_ues_ue1):
         ue = UE(idx=len(liste_ues_avec_coordonnees), app_name='UE1-App1')
         # (PROF) qu'est-ce qu'on fait si c'est pas aléatoire?
         if (type_de_generation == 'a') :
             coords = gen_random_coords(fichier_de_cas)
         ue.coordx, ue.coordy = coords
+        ue.apptype = "app1"
         liste_ues_avec_coordonnees.append(ue)
 
     for i in range(nombre_ues_ue2):
@@ -181,6 +188,7 @@ def assigner_coordonnees_ues(fichier_de_cas):
         if (type_de_generation == 'a') :
             coords = gen_random_coords(fichier_de_cas)
         ue.coordx, ue.coordy = coords
+        ue.apptype = "app2"
         liste_ues_avec_coordonnees.append(ue)
 
     return liste_ues_avec_coordonnees
@@ -199,12 +207,26 @@ def assigner_coordonnees_antennes(fichier_de_cas):
     for idx, coord in enumerate(coords):
         antenna = Antenna(idx)
         antenna.coordx, antenna.coordy = coord
+        # (PROF) Antenna1 est-il Hard-Wired?
+        antenna.group = "Antenna1"
         liste_antennes_avec_coordonnees.append(antenna)
 
     return liste_antennes_avec_coordonnees
 
+# fonction qui ecrit les information par rapport aux antennes  et au UEs
+def write_to_file(antennas, ues, fichier_de_cas):
+
+    with open(fichier_de_cas['ETUDE_IMPORTANT']['COORD_FILES']['write'], 'w') as file:
+        for antenna in antennas:
+            line = f"antenna\t{antenna.id}\t{antenna.group}\t{antenna.coordx}\t{antenna.coordy}\n"
+            file.write(line)
+
+        for ue in ues:
+            line = f"ue\t{ue.id}\t{ue.app}\t{ue.coordx}\t{ue.coordy}\t{ue.apptype}\n"
+            file.write(line)
+
 # Retourne une liste d'antennes et d'ues avec leurs coordonnées initialisées
-def lab0 ():
+def lab0 (fichier_de_cas):
     #TODO ....
     # antennas est une liste qui contient les objets de type Antenna
     # ues est une liste qui contient les objets de type UE
@@ -217,8 +239,6 @@ def lab0 ():
     # doivent avoir leur coordonées initialisées
     # CETTE FONCTION EST OBLIGATOIRE
 
-    #(PROF) nom du yaml est Hard-Wired?
-    fichier_de_cas = read_yaml_file("lab"+ numero_lab + "_eq" + numero_equipe + "_cas.yaml")
     ues = assigner_coordonnees_ues(fichier_de_cas)
     antennas = assigner_coordonnees_antennes(fichier_de_cas)
     return (antennas,ues)
@@ -236,9 +256,14 @@ def lab0 ():
 def main():
     # case_file_name = treat_args()
 
-    antennas, ues = lab0()
+    #(PROF) nom du yaml est Hard-Wired?
+    fichier_de_cas = read_yaml_file("lab"+ numero_lab + "_eq" + numero_equipe + "_cas.yaml")
+
+    antennas, ues = lab0(fichier_de_cas)
 
     # TODO : appeler la fonction ecrire_fichier_de_coordonnees(antennes,ues)
+    write_to_file(antennas,ues,fichier_de_cas)
+    
     print("TEST")
     #
     #TODO les instructions de main qui vont faire appel aux autres fonctions du programme
