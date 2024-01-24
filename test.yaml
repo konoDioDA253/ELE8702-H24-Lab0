@@ -8,7 +8,6 @@
 # En .yaml, pour désactiver un champs, le mettre comme commentaire
 ETUDE_IMPORTANT:
    SCENARIO : Uma
-   ANT_COORD_GEN : g
    UE_COORD_GEN: a
    COORD_FILES:  # Utilisé quand les coordonées sont lues à partir d'un fichier.
       #read: data/coordonnees_case9.txt # actif quand on lis le fichier de coordonnées

@@ -2,14 +2,8 @@
 ## Bouh Abdillahi (Matricule : 1940646)
 ## Vincent Yves Nodjom (Matricule : 1944011)
 ## Équipe : 7
-## STATE OF WIP : 
-# Question 1: est-ce que le fichier de sortie lab0_eqn_coords.txt doit séparer la dernière ligne d'antenne et la première ligne de UE avec une ligne vide?
-# Rep Q1 : Non c'est good ya pas d'espace
-# Question 2: Quel est l'espace entre les colonnes du fichier lab0_eqn_coords.txt
-# Rep Q2 : Tant que la quantité d'espace est la même c'est good 
-# Question 3: les IDs d'appareil dans lab0_eqn_coords.txt doivent avoir le moins de chiffre possible? 
-# Question 4: faut t-il que l'alignement soit respecté entre les colonnes?
-# Question 5: faut-il nommer le fichier de sortie lab0_eqn_sortie.txt ou lab0_eqn_coords.txt?
+## Github link : https://github.com/konoDioDA253/ELE8702-H24-Lab0
+
 import sys
 import math
 import yaml
@@ -18,8 +12,10 @@ import os
 import argparse
 
 # Variables GLOBAL
+# Numero propres a l'équipe
 numero_equipe = '7'
 numero_lab = '0'
+# Variables servant à la fonction treat_args()
 parser = argparse.ArgumentParser()
 parser.add_argument("--config", type=str)
 args = parser.parse_args()
@@ -54,10 +50,7 @@ class UE:
         self.assoc_ant=None #id de l'antenne associÃ©e Ã  l'UE (int)\n",
         self.los = True
         self.gen = None # type de gÃ©neration de coordonnÃ©es: 'g', 'a', etc. (str)\n",
-        # self.height = None
-        # (PROF) Est-ce que c'est correct de modifier comme cela la classe?
-        # self.coordx = None
-        # self.coordy = None
+        # Attribut rajoutee par notre equipe
         self.apptype = None # Pas besoin car tirer de la chaine de caractere de group
 
 
@@ -158,7 +151,7 @@ def read_yaml_file(fname):
     # dans le fichier .yaml
     # Si vous préférez vous pouvez utiliser une autre fonction pour lires les fichiers
     # de type .yaml.
-    # !!!!!!!! # À noter que dans cette fonction il faut ajouter les vérifications qui s'imposent
+    # À noter que dans cette fonction il faut ajouter les vérifications qui s'imposent
     # par exemple, l'existance du fichier
     
     # Vérifier l'existence du fichier
@@ -169,6 +162,8 @@ def read_yaml_file(fname):
     with open(fname, 'r') as file:
         return yaml.safe_load(file)
 
+# Fonction attribuant des coordonnées aléatoires
+# Prends en paramètre le fichier de cas pour avoir la longueur et la largeur du terrain    
 def gen_random_coords(fichier_de_cas):
     # Cette fonction doit générer les coordonées pour le cas de positionnement aléatoire
     # TODO PRESENTABLE
@@ -191,10 +186,8 @@ def assigner_coordonnees_ues(fichier_de_cas):
     nombre_ues_ue2 = fichier_de_cas['ETUDE_IMPORTANT']['DEVICES']['UE2-App2']['number']
     type_de_generation = fichier_de_cas['ETUDE_IMPORTANT']['UE_COORD_GEN']
 
-    # (PROF) Est-ce que la division en deux boucles for est considéré Hard-wired? (si oui juste utiliser string concatenation)
     for i in range(nombre_ues_ue1):
         ue = UE(id=len(liste_ues_avec_coordonnees), app_name='UE1-App1')
-        # (PROF) qu'est-ce qu'on fait si c'est pas aléatoire?
         if (type_de_generation == 'a') :
             coords = gen_random_coords(fichier_de_cas)
         ue.gen = type_de_generation
@@ -204,10 +197,8 @@ def assigner_coordonnees_ues(fichier_de_cas):
 
     for i in range(nombre_ues_ue2):
         ue = UE(id=len(liste_ues_avec_coordonnees), app_name='UE2-App2')
-        # (PROF) qu'est-ce qu'on fait si c'est pas aléatoire?
         if (type_de_generation == 'a') :
             coords = gen_random_coords(fichier_de_cas)
-        # ue.coordx, ue.coordy = coords
         ue.gen = type_de_generation
         ue.coords = coords
         ue.apptype = "app2"
@@ -222,7 +213,6 @@ def assigner_coordonnees_antennes(fichier_de_cas):
     nombre_antennes = fichier_de_cas['ETUDE_IMPORTANT']['DEVICES']['Antenna1']['number']
     type_de_generation = fichier_de_cas['ETUDE_IMPORTANT']['ANT_COORD_GEN']
     
-    # (PROF) terrain_shape est-il Hard-Wired? NON c good
     terrain_shape =  fichier_de_cas['ETUDE_IMPORTANT']['GEOMETRY']['Surface']
     coords = gen_lattice_coords(terrain_shape, nombre_antennes)
 
@@ -230,13 +220,12 @@ def assigner_coordonnees_antennes(fichier_de_cas):
         antenna = Antenna(id)
         antenna.coords = coord
         antenna.gen = type_de_generation
-        # (PROF) Antenna1 est-il Hard-Wired? OUI utiliser get_dict
         antenna.group = "Antenna1"
         liste_antennes_avec_coordonnees.append(antenna)
 
     return liste_antennes_avec_coordonnees
 
-# fonction qui ecrit les information par rapport aux antennes  et au UEs
+# fonction qui ecrit les information par rapport aux antennes et au UEs
 def write_to_file(antennas, ues, fichier_de_cas):
 
     with open(fichier_de_cas['ETUDE_IMPORTANT']['COORD_FILES']['write'], 'w') as file:
@@ -266,6 +255,7 @@ def lab0 (fichier_de_cas):
     antennas = assigner_coordonnees_antennes(fichier_de_cas)
     return (antennas,ues)
 
+# Fonction vérifiant si le fichier YAML fournit en input a la bonne structure 
 def validate_yaml_structure(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -299,12 +289,13 @@ def validate_yaml_structure(file_path):
 
     # Validate the structure
     if not validate_structure(yaml_content, expected_structure):
-        print(f"Invalid structure in YAML file '{file_path}'")
+        # Invalid structure in YAML file
         return False
 
-    print(f"Valid structure in YAML file '{file_path}'")
+    # Valid structure in YAML file
     return True
 
+# Fonction comparant deux structures YAML et retournant False si différence existe
 def validate_structure(content, expected_structure):
     if not isinstance(content, dict) or not isinstance(expected_structure, dict):
         return False
@@ -327,11 +318,11 @@ def treat_args() :
     # CETTE FONCTION EST OBLIGATOIRE
     # À noter que dans cette fonction il faut ajouter les vérifications qui s'imposent
     # par exemple, nombre d'arguments appropriés, existance du fichier de cas, etc.
-    # return case_file_name
     case_file_name = args.config
     # Check if the file exists
     YAML_file_exists = True
     YAML_file_correct_extension = True
+    correct_yaml_structure = True
     if os.path.isfile(case_file_name):
         # Check if the file has a YAML extension
         _, file_extension = os.path.splitext(case_file_name)
@@ -340,51 +331,44 @@ def treat_args() :
         else:
             # YAML has the correct extension
             # Check if the YAML structure is good
-            correct_yaml_structure = True
             file_path = case_file_name
             if validate_yaml_structure(file_path):
-                # print(f"The YAML file '{file_path}' has the correct structure.")
-                correct_yaml_structure == True
+                correct_yaml_structure = True
             else:
-                # print(f"The YAML file '{file_path}' does not have the correct structure.")
-                correct_yaml_structure == False
+                correct_yaml_structure = False
     else:
         YAML_file_exists = False
-
-
-
-
     return YAML_file_exists, YAML_file_correct_extension, correct_yaml_structure, case_file_name
 
 def main():
     yaml_exist, yaml_correct_extenstion, correct_yaml_structure, case_file_name = treat_args()
-    print(case_file_name)
+    print("YAML file name = ", case_file_name)
     if (yaml_exist == False):
-        print("YAML file doesn't exist!")    
+        print("YAML file doesn't exist!")   
+        return 
     else:
         print("YAML file exists")
     if yaml_correct_extenstion == False :
         print(f"The YAML file does not have the correct extension.")
+        return
     else:
-        print(f"The YAML file have the correct extension.")
+        print(f"The YAML file has the correct extension.")
     if correct_yaml_structure == True:
         print(f"The YAML file has the correct structure.")
     else:
         print(f"The YAML file does not have the correct structure.")
+        return
 
-
-
-    #(PROF) nom du yaml est Hard-Wired?
-    fichier_de_cas = read_yaml_file("lab"+ numero_lab + "_eq" + numero_equipe + "_cas.yaml")
-
-    antennas, ues = lab0(fichier_de_cas)
-
-    # TODO : appeler la fonction ecrire_fichier_de_coordonnees(antennes,ues)
-    write_to_file(antennas,ues,fichier_de_cas)
-    
     #
     #TODO les instructions de main qui vont faire appel aux autres fonctions du programme
     #.....
+    fichier_de_cas = read_yaml_file(case_file_name)
+
+    antennas, ues = lab0(fichier_de_cas)
+
+    write_to_file(antennas,ues,fichier_de_cas)
+    
+
 
 if __name__ == '__main__':
     main()

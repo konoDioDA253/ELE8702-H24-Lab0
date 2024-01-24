@@ -1,0 +1,75 @@
+antenna	0	Antenna1	833.3	571.4
+antenna	1	Antenna1	1666.7	571.4
+antenna	2	Antenna1	2500.0	571.4
+antenna	3	Antenna1	3333.3	571.4
+antenna	4	Antenna1	4166.7	571.4
+antenna	5	Antenna1	833.3	1142.9
+antenna	6	Antenna1	1666.7	1142.9
+antenna	7	Antenna1	2500.0	1142.9
+antenna	8	Antenna1	3333.3	1142.9
+antenna	9	Antenna1	4166.7	1142.9
+antenna	10	Antenna1	833.3	1714.3
+antenna	11	Antenna1	1666.7	1714.3
+antenna	12	Antenna1	2500.0	1714.3
+antenna	13	Antenna1	3333.3	1714.3
+antenna	14	Antenna1	4166.7	1714.3
+antenna	15	Antenna1	833.3	2285.7
+antenna	16	Antenna1	1666.7	2285.7
+antenna	17	Antenna1	2500.0	2285.7
+antenna	18	Antenna1	3333.3	2285.7
+antenna	19	Antenna1	4166.7	2285.7
+antenna	20	Antenna1	833.3	2857.1
+antenna	21	Antenna1	1666.7	2857.1
+antenna	22	Antenna1	2500.0	2857.1
+antenna	23	Antenna1	3333.3	2857.1
+antenna	24	Antenna1	4166.7	2857.1
+ue	0	UE1-App1	429	1097	app1
+ue	1	UE1-App1	715	3150	app1
+ue	2	UE1-App1	3337	1092	app1
+ue	3	UE1-App1	883	3435	app1
+ue	4	UE1-App1	313	1553	app1
+ue	5	UE1-App1	4393	2304	app1
+ue	6	UE1-App1	2722	1396	app1
+ue	7	UE1-App1	426	654	app1
+ue	8	UE1-App1	1107	1382	app1
+ue	9	UE1-App1	4596	1368	app1
+ue	10	UE1-App1	2009	671	app1
+ue	11	UE1-App1	14	3711	app1
+ue	12	UE1-App1	3574	3169	app1
+ue	13	UE1-App1	718	3599	app1
+ue	14	UE1-App1	4896	1547	app1
+ue	15	UE1-App1	573	28	app1
+ue	16	UE1-App1	2585	2999	app1
+ue	17	UE1-App1	3673	418	app1
+ue	18	UE1-App1	360	380	app1
+ue	19	UE1-App1	1165	518	app1
+ue	20	UE1-App1	174	1196	app1
+ue	21	UE1-App1	3528	2349	app1
+ue	22	UE1-App1	3907	1087	app1
+ue	23	UE1-App1	3845	3432	app1
+ue	24	UE1-App1	302	3149	app1
+ue	25	UE1-App1	2500	1407	app1
+ue	26	UE1-App1	4274	3283	app1
+ue	27	UE1-App1	3957	848	app1
+ue	28	UE1-App1	4989	2617	app1
+ue	29	UE1-App1	4318	2314	app1
+ue	30	UE2-App2	2583	52	app2
+ue	31	UE2-App2	3263	3658	app2
+ue	32	UE2-App2	4201	1780	app2
+ue	33	UE2-App2	4412	2615	app2
+ue	34	UE2-App2	4887	3646	app2
+ue	35	UE2-App2	3983	2133	app2
+ue	36	UE2-App2	3437	1535	app2
+ue	37	UE2-App2	4179	131	app2
+ue	38	UE2-App2	1487	2973	app2
+ue	39	UE2-App2	677	3743	app2
+ue	40	UE2-App2	3989	2696	app2
+ue	41	UE2-App2	2146	697	app2
+ue	42	UE2-App2	2744	1381	app2
+ue	43	UE2-App2	4541	1603	app2
+ue	44	UE2-App2	601	2962	app2
+ue	45	UE2-App2	3742	1588	app2
+ue	46	UE2-App2	4696	3190	app2
+ue	47	UE2-App2	2754	67	app2
+ue	48	UE2-App2	1549	2402	app2
+ue	49	UE2-App2	723	3407	app2
