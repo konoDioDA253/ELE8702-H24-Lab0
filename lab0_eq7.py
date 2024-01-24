@@ -4,7 +4,9 @@
 ## Équipe : 7
 ## STATE OF WIP : 
 # Question 1: est-ce que le fichier de sortie lab0_eqn_coords.txt doit séparer la dernière ligne d'antenne et la première ligne de UE avec une ligne vide?
+# Rep Q1 : Non c'est good ya pas d'espace
 # Question 2: Quel est l'espace entre les colonnes du fichier lab0_eqn_coords.txt
+# Rep Q2 : Tant que la quantité d'espace est la même c'est good 
 # Question 3: les IDs d'appareil dans lab0_eqn_coords.txt doivent avoir le moins de chiffre possible? 
 # Question 4: faut t-il que l'alignement soit respecté entre les colonnes?
 # Question 5: faut-il nommer le fichier de sortie lab0_eqn_sortie.txt ou lab0_eqn_coords.txt?
@@ -12,10 +14,15 @@ import sys
 import math
 import yaml
 import random
+import os
+import argparse
 
 # Variables GLOBAL
 numero_equipe = '7'
 numero_lab = '0'
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", type=str)
+args = parser.parse_args()
 
 
 # Germe de toutes les fonctions aléatoires
@@ -23,31 +30,35 @@ random.seed(123)
 
 class Antenna:
     
-    def __init__(self, idx):
-        self.id = idx
+    def __init__(self, id):
+        self.id = id
+        self.group = None
         self.coords = None
+        self.assoc_ues = []
         self.scenario = None
-        self.height = None
         self.frequency = None
+        self.gen    = None # type de gÃ©neration de coordonnÃ©es: 'g', 'a', etc. (str)\n",
+        # self.height = None
         # (PROF) Est-ce que c'est correct de modifier comme cela la classe?
         # self.coordx = None
         # self.coordy = None
-        self.group = None
 
     
 class UE:
     
-    def __init__(self, idx, app_name):
-        self.id= idx
-        self.coords = None
+    def __init__(self, id, app_name):
+        self.id= id
         self.group = None
+        self.coords = None
         self.app=app_name
-        self.height = None
+        self.assoc_ant=None #id de l'antenne associÃ©e Ã  l'UE (int)\n",
         self.los = True
+        self.gen = None # type de gÃ©neration de coordonnÃ©es: 'g', 'a', etc. (str)\n",
+        # self.height = None
         # (PROF) Est-ce que c'est correct de modifier comme cela la classe?
         # self.coordx = None
         # self.coordy = None
-        self.apptype = None
+        self.apptype = None # Pas besoin car tirer de la chaine de caractere de group
 
 
 def fill_up_the_lattice(N, lh, lv, nh, nv):
@@ -149,7 +160,13 @@ def read_yaml_file(fname):
     # de type .yaml.
     # !!!!!!!! # À noter que dans cette fonction il faut ajouter les vérifications qui s'imposent
     # par exemple, l'existance du fichier
-    with open(fname,'r') as file:
+    
+    # Vérifier l'existence du fichier
+    if not os.path.exists(fname):
+        raise FileNotFoundError(f"Le fichier {fname} n'existe pas.")
+
+    # Ouvrir et lire le fichier YAML
+    with open(fname, 'r') as file:
         return yaml.safe_load(file)
 
 def gen_random_coords(fichier_de_cas):
@@ -161,7 +178,7 @@ def gen_random_coords(fichier_de_cas):
 
     x_aleatoire = random.randint(1, longueur_geometry)
     y_aleatoire = random.randint(1, hauteur_geometry)
-    coordonnees_aleatoires = {x_aleatoire, y_aleatoire}
+    coordonnees_aleatoires = [x_aleatoire, y_aleatoire]
     return coordonnees_aleatoires
 
 
@@ -176,21 +193,22 @@ def assigner_coordonnees_ues(fichier_de_cas):
 
     # (PROF) Est-ce que la division en deux boucles for est considéré Hard-wired? (si oui juste utiliser string concatenation)
     for i in range(nombre_ues_ue1):
-        ue = UE(idx=len(liste_ues_avec_coordonnees), app_name='UE1-App1')
+        ue = UE(id=len(liste_ues_avec_coordonnees), app_name='UE1-App1')
         # (PROF) qu'est-ce qu'on fait si c'est pas aléatoire?
         if (type_de_generation == 'a') :
             coords = gen_random_coords(fichier_de_cas)
-        # ue.coordx, ue.coordy = coords
+        ue.gen = type_de_generation
         ue.coords = coords
         ue.apptype = "app1"
         liste_ues_avec_coordonnees.append(ue)
 
     for i in range(nombre_ues_ue2):
-        ue = UE(idx=len(liste_ues_avec_coordonnees), app_name='UE2-App2')
+        ue = UE(id=len(liste_ues_avec_coordonnees), app_name='UE2-App2')
         # (PROF) qu'est-ce qu'on fait si c'est pas aléatoire?
         if (type_de_generation == 'a') :
             coords = gen_random_coords(fichier_de_cas)
         # ue.coordx, ue.coordy = coords
+        ue.gen = type_de_generation
         ue.coords = coords
         ue.apptype = "app2"
         liste_ues_avec_coordonnees.append(ue)
@@ -208,10 +226,11 @@ def assigner_coordonnees_antennes(fichier_de_cas):
     terrain_shape =  fichier_de_cas['ETUDE_IMPORTANT']['GEOMETRY']['Surface']
     coords = gen_lattice_coords(terrain_shape, nombre_antennes)
 
-    for idx, coord in enumerate(coords):
-        antenna = Antenna(idx)
+    for id, coord in enumerate(coords):
+        antenna = Antenna(id)
         antenna.coords = coord
-        # (PROF) Antenna1 est-il Hard-Wired?
+        antenna.gen = type_de_generation
+        # (PROF) Antenna1 est-il Hard-Wired? OUI utiliser get_dict
         antenna.group = "Antenna1"
         liste_antennes_avec_coordonnees.append(antenna)
 
@@ -222,7 +241,7 @@ def write_to_file(antennas, ues, fichier_de_cas):
 
     with open(fichier_de_cas['ETUDE_IMPORTANT']['COORD_FILES']['write'], 'w') as file:
         for antenna in antennas:
-            line = f"antenna\t{antenna.id}\t{antenna.group}\t{antenna.coords[0]}\t{antenna.coords[1]}\n"
+            line = f"antenna\t{antenna.id}\t{antenna.group}\t{round(antenna.coords[0],1)}\t{round(antenna.coords[1], 1)}\n"
             file.write(line)
 
         for ue in ues:
@@ -247,19 +266,22 @@ def lab0 (fichier_de_cas):
     antennas = assigner_coordonnees_antennes(fichier_de_cas)
     return (antennas,ues)
 
-# def treat_args() :
-#     # cette fonction doit retourner le nom du fichier de cas à partir de l'interface de commande (CLI)
-#     #... 
-#     # TODO
-#     #....
-#     # CETTE FONCTION EST OBLIGATOIRE
-#     # À noter que dans cette fonction il faut ajouter les vérifications qui s'imposent
-#     # par exemple, nombre d'arguments appropriés, existance du fichier de cas, etc.
-#     return case_file_name
+def treat_args() :
+    # cette fonction doit retourner le nom du fichier de cas à partir de l'interface de commande (CLI)
+    #... 
+    # TODO
+    #....
+    # CETTE FONCTION EST OBLIGATOIRE
+    # À noter que dans cette fonction il faut ajouter les vérifications qui s'imposent
+    # par exemple, nombre d'arguments appropriés, existance du fichier de cas, etc.
+    # return case_file_name
+    case_file_name = args.config
+    return case_file_name
+# def treat_args():
 
 def main():
-    # case_file_name = treat_args()
-
+    case_file_name = treat_args()
+    print(case_file_name)
     #(PROF) nom du yaml est Hard-Wired?
     fichier_de_cas = read_yaml_file("lab"+ numero_lab + "_eq" + numero_equipe + "_cas.yaml")
 
