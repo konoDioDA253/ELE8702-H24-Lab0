@@ -266,6 +266,59 @@ def lab0 (fichier_de_cas):
     antennas = assigner_coordonnees_antennes(fichier_de_cas)
     return (antennas,ues)
 
+def validate_yaml_structure(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            yaml_content = yaml.load(file, Loader=yaml.FullLoader)
+    except yaml.YAMLError as e:
+        print(f"Error loading YAML file '{file_path}': {e}")
+        return False
+
+    # Define the expected structure
+    expected_structure = {
+        'ETUDE_IMPORTANT': {
+            'SCENARIO': None,
+            'ANT_COORD_GEN': None,
+            'UE_COORD_GEN': None,
+            'COORD_FILES': None,
+            'DEVICES': {
+                'Antenna1': {'number': None},
+                'UE1-App1': {'number': None},
+                'UE2-App2': {'number': None},
+            },
+            'GEOMETRY': {
+                'Surface': {
+                    'rectangle': {
+                        'length': None,
+                        'height': None
+                    }
+                }
+            }
+        }
+    }
+
+    # Validate the structure
+    if not validate_structure(yaml_content, expected_structure):
+        print(f"Invalid structure in YAML file '{file_path}'")
+        return False
+
+    print(f"Valid structure in YAML file '{file_path}'")
+    return True
+
+def validate_structure(content, expected_structure):
+    if not isinstance(content, dict) or not isinstance(expected_structure, dict):
+        return False
+
+    for key, value in expected_structure.items():
+        if key not in content:
+            return False
+
+        if value is not None and not validate_structure(content[key], value):
+            return False
+
+    return True
+
+
 def treat_args() :
     # cette fonction doit retourner le nom du fichier de cas à partir de l'interface de commande (CLI)
     #... 
@@ -276,12 +329,51 @@ def treat_args() :
     # par exemple, nombre d'arguments appropriés, existance du fichier de cas, etc.
     # return case_file_name
     case_file_name = args.config
-    return case_file_name
-# def treat_args():
+    # Check if the file exists
+    YAML_file_exists = True
+    YAML_file_correct_extension = True
+    if os.path.isfile(case_file_name):
+        # Check if the file has a YAML extension
+        _, file_extension = os.path.splitext(case_file_name)
+        if file_extension.lower() not in ['.yaml', '.yml']:
+            YAML_file_correct_extension = False
+        else:
+            # YAML has the correct extension
+            # Check if the YAML structure is good
+            correct_yaml_structure = True
+            file_path = case_file_name
+            if validate_yaml_structure(file_path):
+                # print(f"The YAML file '{file_path}' has the correct structure.")
+                correct_yaml_structure == True
+            else:
+                # print(f"The YAML file '{file_path}' does not have the correct structure.")
+                correct_yaml_structure == False
+    else:
+        YAML_file_exists = False
+
+
+
+
+    return YAML_file_exists, YAML_file_correct_extension, correct_yaml_structure, case_file_name
 
 def main():
-    case_file_name = treat_args()
+    yaml_exist, yaml_correct_extenstion, correct_yaml_structure, case_file_name = treat_args()
     print(case_file_name)
+    if (yaml_exist == False):
+        print("YAML file doesn't exist!")    
+    else:
+        print("YAML file exists")
+    if yaml_correct_extenstion == False :
+        print(f"The YAML file does not have the correct extension.")
+    else:
+        print(f"The YAML file have the correct extension.")
+    if correct_yaml_structure == True:
+        print(f"The YAML file has the correct structure.")
+    else:
+        print(f"The YAML file does not have the correct structure.")
+
+
+
     #(PROF) nom du yaml est Hard-Wired?
     fichier_de_cas = read_yaml_file("lab"+ numero_lab + "_eq" + numero_equipe + "_cas.yaml")
 
@@ -290,7 +382,6 @@ def main():
     # TODO : appeler la fonction ecrire_fichier_de_coordonnees(antennes,ues)
     write_to_file(antennas,ues,fichier_de_cas)
     
-    print("TEST")
     #
     #TODO les instructions de main qui vont faire appel aux autres fonctions du programme
     #.....
